@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Loader from 'react-loader-spinner';
-// https://api.fakenewsdetector.org/votes_by_content?content=Protests against Donald Trump have occurred in the United States, Europe and elsewhere since his entry into the 2016 presidential campaign
-//https://api.fakenewsdetector.org/votes?url=https://en.wikipedia.org/wiki/Al_Arabiya&title=
-
-const results = props => (<h1> Results </h1>);
-
 
 const classes = {
   parent: {
@@ -15,7 +10,7 @@ const classes = {
     "border" : "1px dotted black",
     "border-radius" : "5px",
     "padding" : "10px",
-    "background-color" : "lightgray"
+    "background-color" : "#efefef"
   },
   column1: {
     "flex" : "1 1 0px",
@@ -34,16 +29,26 @@ const classes = {
     "padding-right": "20px"
   },
   submit: {
-    height : "40px"
+    "height" : "40px",
+    "text-decoration": "none",
+    "cursor": "pointer"
+  },
+  cell: {
+    "padding" : "5px",
+    "padding-right" : "30px"
   }
 };
 
 
 class Home extends Component {
   state = {
+    fake: 0,
+    clickbait: 0,
+    biased: 0,
     data: "",
     content: "",
-    working: false
+    working: false,
+    feedback: false
   }
 
   isValidURL = (str) => {
@@ -72,7 +77,13 @@ class Home extends Component {
     axios.get(url)
       .then((response) => { 
           this.setState({ data:JSON.stringify(response.data, null, 4) })
-          this.setState({working: false});
+          this.setState({
+            working: false,
+            feedback: false,
+            fake: Math.ceil(response.data.robot.fake_news * 100),
+            clickbait: Math.ceil(response.data.robot.clickbait),
+            biased: Math.ceil(response.data.robot.extremely_biased * 100)
+          });
         }
       )
       .catch((err) => {
@@ -87,6 +98,14 @@ class Home extends Component {
     this.setState({content: e.target.value});
   }
 
+  submitFeedback = (e) => {
+    e.preventDefault();
+    this.setState({feedbackWorking: true});
+    setTimeout(() => {
+      this.setState({feedbackWorking: false, feedback: true});
+    }, 2000);
+  }
+
   render() {
     return (
       <div style={classes.base}>
@@ -96,9 +115,9 @@ class Home extends Component {
             Team Dirty Bits' Deloitte Technoutsav 2.0 project
           </h3>
 
-          This is a demo website for our project. Just enter some text or a link in the text box below and press the button for the magic.
+          This is a demo website for our project. Just enter some text or a link in the text box below and press the button for the magic to happen.
 
-          <br/><br/>
+          <br/><br/><br/><br/>
           <form onSubmit={this.process} action="" method="POST">
             <input
               required={true}
@@ -106,6 +125,7 @@ class Home extends Component {
               onChange={this.onContentChange}
               name="content"
               style={classes.textbox}
+              placeholder="URL or news text"
             />
             &nbsp;&nbsp;
             <input
@@ -121,12 +141,91 @@ class Home extends Component {
             this.state.data !== "" && (
               <div style = {classes.parent}>
                 <div style = {classes.column1}>
-                  <pre>
+                  <h2>Response</h2>
+                  <pre style={{"font-size":"15px"}}>
                     {this.state.data}
                   </pre>
                 </div>
                 <div style = {classes.column2}>
-                  <results />
+                  <h2>Verdict</h2>
+                  <table>
+                    <tr>
+                      <td style={classes.cell}>Fake News</td>
+                      <td style={classes.cell}><b>{this.state.fake}%</b></td>
+                    </tr>
+                    <tr>
+                      <td style={classes.cell}>Clickbait</td>
+                      <td style={classes.cell}><b>{this.state.clickbait}%</b></td>
+                    </tr>
+                    <tr>
+                      <td style={classes.cell}>Extremely Biased</td>
+                      <td style={classes.cell}><b>{this.state.biased}%</b></td>
+                    </tr>
+                  </table>
+                  <br/><br/>
+                  <hr style={{"border-top" : "1px dotted black", "border-bottom" : "none"}}/>
+                  <br/>
+                  {
+                    !this.state.feedback ? (
+                      <div>
+                        Think this is wrong? Help us by telling us what it is.
+                        <br/><br/>
+                        <form onSubmit={this.submitFeedback}>
+                          <input
+                            type="radio"
+                            name="class"
+                            value="fake"
+                            style={{"margin-right":"12px"}}
+                          />
+                          Fake news<br/><br/>
+                          <input
+                            type="radio"
+                            name="class"
+                            value="bait"
+                            style={{"margin-right":"12px"}}
+                          />
+                          Clickbait<br/><br/>
+                          <input
+                            type="radio"
+                            name="class"
+                            value="bias"
+                            style={{"margin-right":"12px"}}
+                          />
+                          Extremely Biased<br/><br/>
+                          <input
+                            type="radio"
+                            name="class"
+                            value="legit"
+                            style={{"margin-right":"12px"}}
+                          />
+                          Legitimate<br/><br/><br/>
+                          {
+                            this.state.feedbackWorking
+                            ? <div style={{"margin-left" : "20px"}}>
+                                <Loader
+                                  type="Puff"
+                                  color="#b0b0b0"
+                                  height="30" 
+                                  width="30"
+                                />
+                              </div>
+                            : <input type="submit" value="Submit"/>
+                          }
+                        </form>
+                      </div>
+                    ) : (
+                      <div>
+                        <h2> Thanks! </h2>
+                        <br/>
+                        Your feedback has been submitted.<br/><br/>
+                        Thank you for helping us out!
+                        <br/><br/>
+                      </div>
+                    )
+                  }
+                  
+
+
                 </div>
               </div>
             )
@@ -137,13 +236,12 @@ class Home extends Component {
               <div style={{"height" : "100px"}} />
               <Loader 
                 type="Puff"
-                color="#0f0f0f"
-                height="100" 
-                width="100"
+                color="#b0b0b0"
+                height="50" 
+                width="50"
               />
             </div>
           }
-          
         </center>
       </div>
     );
