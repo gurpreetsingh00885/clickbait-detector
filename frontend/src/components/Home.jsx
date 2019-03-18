@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Loader from 'react-loader-spinner';
+const google = window.google;
 
 const classes = {
   parent: {
@@ -36,6 +37,15 @@ const classes = {
   cell: {
     "padding" : "5px",
     "padding-right" : "30px"
+  },
+  keywords: {
+    "font-size" : "20px",
+    "margin-bottom" : "100px",
+    "border": "1px solid #afafaf",
+    "border-radius" : "5px",
+    "min-width" : "700px",
+    "max-width" : "800px",
+    "padding" : "20px"
   }
 };
 
@@ -47,6 +57,7 @@ class Home extends Component {
     biased: 0,
     data: "",
     content: "",
+    keywords: [],
     working: false,
     feedback: false
   }
@@ -73,7 +84,7 @@ class Home extends Component {
     else {
       url = 'https://api.fakenewsdetector.org/votes_by_content?content='+content;
     }
-    this.setState({working: true});
+    this.setState({working: true, keywords: []});
     axios.get(url)
       .then((response) => { 
           this.setState({ data:JSON.stringify(response.data, null, 4) })
@@ -82,8 +93,11 @@ class Home extends Component {
             feedback: false,
             fake: Math.ceil(response.data.robot.fake_news * 100),
             clickbait: Math.ceil(response.data.robot.clickbait),
-            biased: Math.ceil(response.data.robot.extremely_biased * 100)
+            biased: Math.ceil(response.data.robot.extremely_biased * 100),
+            keywords: response.data.keywords,
           });
+          
+          
         }
       )
       .catch((err) => {
@@ -95,6 +109,7 @@ class Home extends Component {
   }
 
   onContentChange = (e) => {
+    console.log(google);
     this.setState({content: e.target.value});
   }
 
@@ -111,6 +126,7 @@ class Home extends Component {
       <div style={classes.base}>
         <center>
           <h1> Fake News Detector </h1>
+          <br/>
           <h3>
             Team Dirty Bits' Deloitte Technoutsav 2.0 project
           </h3>
@@ -176,6 +192,7 @@ class Home extends Component {
                             name="class"
                             value="fake"
                             style={{"margin-right":"12px"}}
+                            checked
                           />
                           Fake news<br/><br/>
                           <input
@@ -242,6 +259,26 @@ class Home extends Component {
               />
             </div>
           }
+          <div>
+            <div class="gcse-searchbox" data-resultsUrl="http://www.example.com"
+data-newWindow="true" data-queryParameterName="search" id="el1"/>
+            <div class="gcse-searchresults" data-resultsUrl="http://www.example.com"
+data-newWindow="true" data-queryParameterName="search" id="el2" />
+          </div>
+
+
+          {
+            this.state.keywords.length !== 0 && (
+              <div>
+                <br/><br/>
+                We extracted the following keywords. Feel free to copy them and search them using your favourite search engine.<br/><br/>
+                <div style={classes.keywords}>
+                  {this.state.keywords.map((item, key) => <span key={key}>{item+"   "}</span>)}
+                </div>
+              </div>
+            )
+          }
+
         </center>
       </div>
     );
