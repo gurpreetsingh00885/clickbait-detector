@@ -7,7 +7,7 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 import os
 
 
-configuration = os.getenv('ENVIRONMENT', 'development').title()
+configuration = os.getenv('ENVIRONMENT', 'production').title()
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fakenews.settings')
 os.environ.setdefault('DJANGO_CONFIGURATION', configuration)
 

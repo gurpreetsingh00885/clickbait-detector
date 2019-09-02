@@ -128,7 +128,7 @@ class Home extends Component {
           <h1> Fake News Detector </h1>
           <br/>
           <h3>
-            Team Dirty Bits' Deloitte Technoutsav 2.0 project
+            Gurpreet Singh | Iknoor Singh | Sagar Kalra <br/>
           </h3>
 
           This is a demo website for our project. Just enter some text or a link in the text box below and press the button for the magic to happen.
