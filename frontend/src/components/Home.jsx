@@ -92,12 +92,10 @@ class Home extends Component {
             working: false,
             feedback: false,
             fake: Math.ceil(response.data.robot.fake_news * 100),
-            clickbait: Math.ceil(response.data.robot.clickbait),
+            clickbait: Math.ceil(response.data.robot.clickbait * 100),
             biased: Math.ceil(response.data.robot.extremely_biased * 100),
             keywords: response.data.keywords,
           });
-          
-          
         }
       )
       .catch((err) => {
