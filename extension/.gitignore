@@ -1,5 +1,7 @@
 node_modules
-dist
-dev
 temp
-.idea
+.tmp
+dist
+.sass-cache
+.DS_Store
+build
